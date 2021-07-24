@@ -1,0 +1,14 @@
+#!/bin/bash
+#set -x
+BACKUP_PATH="/home/che/scripts/pihole-teleporter/"
+LOGFILENAME=/var/log/pihole-teleporter-nextcloud.log
+cd $BACKUP_PATH
+
+LOGDATE=$(date -I)_$(date +%H:%M:%S)
+echo "$LOGDATE STARTING PIHOLE BACKUP" >> $LOGFILENAME
+pihole -a teleporter
+sleep 5
+TELEPORTER=$(ls -t1 | head -1)
+curl -s -S -T "$BACKUP_PATH$TELEPORTER" -u '$nc_user:$nc_pass' "https://cloud.krsmanovic.me/remote.php/dav/files/che/PiHole/" >> $LOGFILENAME 2>&1
+LOGDATE=$(date -I)_$(date +%H:%M:%S)
+echo "$LOGDATE FINISHED PIHOLE BACKUP" >> $LOGFILENAME

@@ -1,0 +1,8 @@
+#!/bin/bash
+
+stamp=$(date -I)
+fileName="/tmp/scripts-backup-$stamp.tar.gz"
+
+tar -czf $fileName /home/che/scripts
+curl -s -S -T "$fileName" -u '$nc_user:$nc_pass' "https://cloud.krsmanovic.me/remote.php/dav/files/che/linux-scripts/"
+rm -rf $fileName

@@ -1,0 +1,27 @@
+#!/bin/bash
+folder="/home/che/scripts/backups-mtik"
+
+if [ ! -d $folder ]; then
+  mkdir -p $folder
+fi
+
+make_backup () {
+
+  local router_name=$1
+
+  file_cfg="$(date -I)_$router_name.rsc"
+  file_bkp="$(date -I)_$router_name.backup"
+
+  router_ssh="ssh robot@$router_name"
+
+  $router_ssh "/export file=$file_cfg"
+  $router_ssh "/system backup save name=$file_bkp"
+  scp robot@$router_name:{$file_cfg,$file_bkp} $folder
+
+  $router_ssh "/file remove \"$file_bkp\";/file remove \"$file_cfg\""
+  $router_ssh ":log info \"#################### Backup files $file_cfg and $file_bkp are saved to $folder. Router $router_name cleanup done. ####################\""
+}
+
+make_backup fw.lan
+make_backup ap.lan
+make_backup rb532a.lan
