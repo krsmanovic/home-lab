@@ -1,0 +1,33 @@
+{
+  "ignition": {
+    "version": "3.0.0"
+  },
+  "passwd": {
+    "users": [
+      {
+        "name": "core",
+        "sshAuthorizedKeys": [
+          "ssh-rsa BlAbLa"
+        ]
+      }
+    ]
+  },
+  "storage": {
+    "files": [
+      {
+        "path": "/etc/hostname",
+        "mode": 420,
+        "overwrite": true,
+        "contents": { "source": "data:,coreos" }
+      },
+      {
+        "path": "/etc/NetworkManager/system-connections/ens192.nmconnection",
+        "mode": 384,
+        "overwrite": true,
+        "contents": {
+          "source": "data:text/plain;charset=utf-8;base64,W2Nvbm5lY3Rpb25dDQppZD1lbnMxOTINCnV1aWQ9ZmUzYjE3NTctMWRmYS00MDgzLWFiM2ItMmMxNjdlZDk0ZDBmDQp0eXBlPWV0aGVybmV0DQppbnRlcmZhY2UtbmFtZT1lbnMxOTINCnBlcm1pc3Npb25zPQ0KDQpbZXRoZXJuZXRdDQptYWMtYWRkcmVzcy1ibGFja2xpc3Q9DQoNCltpcHY0XQ0KYWRkcmVzczE9MTkyLjE2OC4xMS40MC8yNCwxOTIuMTY4LjExLjI1NA0KZG5zPTE5Mi4xNjguMTEuMTE7DQpkbnMtc2VhcmNoPQ0KbWV0aG9kPW1hbnVhbA0KDQpbaXB2Nl0NCmFkZHItZ2VuLW1vZGU9c3RhYmxlLXByaXZhY3kNCmRucy1zZWFyY2g9DQptZXRob2Q9ZGlzYWJsZWQNCg0KW3Byb3h5XQ=="
+        }
+      }
+    ]
+  }
+}
