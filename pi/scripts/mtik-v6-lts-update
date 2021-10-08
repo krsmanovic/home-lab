@@ -1,32 +1,37 @@
 #!/bin/bash
 
-mikrotik_available=$(curl -s http://upgrade.mikrotik.com/routeros/LATEST.6fix | awk '{print $1}')
-sanitized_available=$(echo $mikrotik_available | sed 's/\.//g')
+mtik_up_ver=$(curl -s http://upgrade.mikrotik.com/routeros/LATEST.6fix | awk '{print $1}')
+mtik_up_ver_math=$(echo $mtik_up_ver | sed 's/\.//g')
 
-run_update () {
-  date_mikrotik=$(curl -s http://upgrade.mikrotik.com/routeros/$mikrotik_available/CHANGELOG | grep $mikrotik_available | awk -F '(' '{print $2}' | awk '{print $1}')
-  date_sanitized=$(echo $date_mikrotik | sed -e  's/Jan/01/1' -e 's/Feb/02/1' -e 's/Mar/03/1' -e 's/Apr/04/1' -e 's/May/05/1' -e 's/Jun/06/1' -e 's/Jul/07/1' -e 's/Aug/08/1' -e 's/Sep/09/1' -e 's/Oct/10/1' -e 's/Nov/11/1' -e 's/Dec/12/1')
-  days=$(echo $(( ($(date +%s) - $(date +%s -d "$date_sanitized")) / 86400 )))
-  if [[ $days > 30 ]]; then
-    $router_ssh ":log info \"New version older than a month is detected. It is safe to start the update process.\""
-    $router_ssh "/system script run check-for-update"
-  else
-    $router_ssh ":log info \"New version less than a month old is detected. Staying with current version.\""
-  fi
-}
+mtik_date=$(curl -s http://upgrade.mikrotik.com/routeros/$mtik_up_ver/CHANGELOG | grep $mtik_up_ver | awk -F '(' '{print $2}' | awk '{print $1}')
+mtik_date_math=$(echo $mtik_date | sed -e 's/Jan/01/1' -e 's/Feb/02/1' -e 's/Mar/03/1' -e 's/Apr/04/1' -e 's/May/05/1' -e 's/Jun/06/1' -e 's/Jul/07/1' -e 's/Aug/08/1' -e 's/Sep/09/1' -e 's/Oct/10/1' -e 's/Nov/11/1' -e 's/Dec/12/1')
+mtik_age_days=$(echo $(( ($(date +%s) - $(date +%s -d "$mtik_date_math")) / 86400 )))
 
-check_version () {
+compare_version () {
   local router_name=$1
   router_ssh="ssh -i /home/che/.ssh/id_rsa robot@$router_name"
-  mikrotik_installed=$($router_ssh ':put [/system package update get value-name=installed-version]')
-  sanitized_installed=$(echo $mikrotik_installed | sed 's/\.//g')
-  if (( $(echo "$sanitized_available > $sanitized_installed" | tr -d "\r" | bc -l) )); then
-    run_update
+  $router_ssh ":log info \"New version older than a month is detected. It is safe to start the update check.\""
+  mtik_installed=$($router_ssh ':put [/system package update get value-name=installed-version]')
+  mtik_installed_math=$(echo $mtik_installed | sed 's/\.//g')
+  if (( $(echo "$mtik_up_ver_math > $mtik_installed_math" | tr -d "\r" | bc -l) )); then
+    $router_ssh ":log info \"Running check-for-update script.\""
+    $router_ssh "/system script run check-for-update"
   else
     $router_ssh ":log info \"Latest version is already installed.\""
   fi
 }
 
-check_version ap.lan
-sleep 5m
-check_version fw.lan
+too_risky () {
+  local router_name=$1
+  router_ssh="ssh -i /home/che/.ssh/id_rsa robot@$router_name"
+  $router_ssh ":log info \"New version less than a month old is detected. Staying with current version.\""
+}
+
+if [[ $mtik_age_days > 30 ]]; then
+  compare_version ap.lan
+  sleep 5m
+  compare_version fw.lan
+else
+  too_risky ap.lan
+  too_risky fw.lan
+fi
