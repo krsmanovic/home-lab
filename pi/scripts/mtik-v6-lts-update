@@ -10,21 +10,20 @@ mtik_age_days=$(echo $(( ($(date +%s) - $(date +%s -d "$mtik_date_math")) / 8640
 compare_version () {
   local router_name=$1
   router_ssh="ssh -i /home/che/.ssh/id_rsa robot@$router_name"
-  $router_ssh ":log info \"New version older than a month is detected. It is safe to start the update check.\""
   mtik_installed=$($router_ssh ':put [/system package update get value-name=installed-version]')
   mtik_installed_math=$(echo $mtik_installed | sed 's/\.//g')
   if (( $(echo "$mtik_up_ver_math > $mtik_installed_math" | tr -d "\r" | bc -l) )); then
-    $router_ssh ":log info \"Running check-for-update script.\""
+    $router_ssh ":log info \"New long-term-stable version older than a month is detected. It is safe to start the update.\""
     $router_ssh "/system script run check-for-update"
   else
-    $router_ssh ":log info \"Latest version is already installed.\""
+    $router_ssh ":log info \"Latest long-term-stable version is already installed.\""
   fi
 }
 
 too_risky () {
   local router_name=$1
   router_ssh="ssh -i /home/che/.ssh/id_rsa robot@$router_name"
-  $router_ssh ":log info \"New version less than a month old is detected. Staying with current version.\""
+  $router_ssh ":log info \"New long-term-stable version less than a month old is detected. Staying with current version.\""
 }
 
 if [[ $mtik_age_days > 30 ]]; then
