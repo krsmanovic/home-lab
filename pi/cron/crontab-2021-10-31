@@ -1,0 +1,32 @@
+# crontab for user che
+# m h dom mon dow command
+
+###############################
+###### Runs every Monday ######
+###############################
+
+# DHCP lease from fw.lan
+0 5 * * 1 /home/che/scripts/mtik-dhcplease
+
+#############################################
+###### Runs on last Sunday of the month #####
+#############################################
+# Check update for v6 LTS branch
+30 4 * * 7 [ $(date +\%m) -ne $(date -d 7days +\%m) ] && /home/che/scripts/mtik-v6-lts-update
+
+#############################################
+###### Runs every 1st day of the month ######
+#############################################
+
+# BGP address list updates
+10 0 1 * * /home/che/scripts/ripe-bgp-sbb
+11 0 1 * * /home/che/scripts/ripe-bgp-telemach
+
+# Crontab backup
+0 1 1 * * /usr/bin/crontab -l > /home/che/scripts/cron/crontab-$(date -I)
+
+# Binary and configuration backups for fw.lan, ap.lan, rb532.lan
+0 4 1 * * /home/che/scripts/mtik-backup
+
+# Scripts backup and upload to nextcloud
+10 4 1 * * /home/che/scripts/nextcloud-me
