@@ -1,7 +1,7 @@
 /ip firewall nat
 add action=src-nat chain=srcnat comment="src-nat - isp1 uplink" out-interface=ether1-isp1 to-addresses=192.168.1.2
 add action=src-nat chain=srcnat comment="src-nat - isp2 uplink" out-interface=ether2-isp2 to-addresses=192.168.0.2
-add action=src-nat chain=srcnat comment="src-nat - isp3 uplink" out-interface=eth10.550-isp3 to-addresses=62.193.139.170
+add action=src-nat chain=srcnat comment="src-nat - isp3 uplink" out-interface=eth10.550-isp3 to-addresses=192.168.99.1
 add action=src-nat chain=srcnat comment="src-nat - hairpin pc to vm range" dst-address=192.168.11.0/24 protocol=tcp src-address=192.168.10.2 to-addresses=192.168.11.254
 add action=src-nat chain=srcnat comment="src-nat - dns poisoning" connection-mark=serum-secure to-addresses=192.168.254.101
 add action=src-nat chain=srcnat connection-mark=serum-free to-addresses=192.168.254.102
