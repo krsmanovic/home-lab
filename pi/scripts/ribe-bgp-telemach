@@ -60,7 +60,7 @@ query_ripe () {
   fi
 }
 
-declare -a telemach_array=("telemach-ba AS42560" "telemach-hosting AS41828" "telemach-hr AS205714" "telemach-me AS43846" "telemach-si AS3212")
+declare -a telemach_array=("sbb AS31042" "telemach-ba AS42560" "telemach-hosting AS41828" "telemach-hr AS205714" "telemach-me AS43846" "telemach-si AS3212")
  
 for idx in ${!telemach_array[@]}; do
   query_ripe ${telemach_array[$idx]}
