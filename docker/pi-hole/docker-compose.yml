@@ -1,0 +1,24 @@
+version: "3.8"
+services:
+  pihole:
+    container_name: pihole
+    image: pihole/pihole:latest
+    hostname: pi-balboa
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
+      - "80:80/tcp"
+    extra_hosts:
+      - "balboa balboa.lan:192.168.20.1"
+      - "pi.lan pi.hole:192.168.11.11"
+    environment:
+      TZ: 'Europe/Belgrade'
+      WEBPASSWORD: S3rBfIhW
+      FTLCONF_REPLY_ADDR4: 192.168.20.1
+      SERVERIP: 192.168.20.1
+      IPv6:: 'False'
+    volumes:
+      - './etc-pihole:/etc/pihole'
+      - './etc-dnsmasq.d:/etc/dnsmasq.d'
+      - '/var/log/pihole.log:/var/log/pihole.log'
+    restart: unless-stopped

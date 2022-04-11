@@ -1,0 +1,5 @@
+#!/bin/sh
+leaseFile=/scripts/lease-mtik/$(date -I)
+
+/usr/bin/ssh robot@fw.lan "/ip dhcp-server lease print detail" > $leaseFile
+/usr/bin/ssh robot@fw.lan ":log info \"DHCP lease saved to $leaseFile\""

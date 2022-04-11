@@ -1,0 +1,16 @@
+version: "3.8"
+services:
+  cron-keeper:
+    image: housekeeper:20220325
+    hostname: housekeeper
+    extra_hosts:
+      fw.lan: 192.168.11.254
+      ap.lan: 192.168.99.2
+    dns:
+      - 192.168.20.1
+    env_file:
+      - ./conf/.env
+    volumes:
+      - './scripts:/scripts'
+      - '/var/log/:/var/log/'
+    restart: unless-stopped

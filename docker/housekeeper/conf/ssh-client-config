@@ -1,0 +1,4 @@
+Host *
+  PubkeyAcceptedKeyTypes +ssh-rsa
+  StrictHostKeyChecking no
+  UserKnownHostsFile /dev/null

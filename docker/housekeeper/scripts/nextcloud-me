@@ -1,0 +1,8 @@
+#!/bin/sh
+
+stamp=$(date -I)
+fileName="/tmp/scripts-backup-$stamp.tar.gz"
+
+tar -czf $fileName /scripts
+curl -s -S -T "$fileName" -u $NEXTCLOUD_USERNAME:$NEXTCLOUD_PASSWORD "https://$NEXTCLOUD_URL/remote.php/dav/files/che/linux-scripts/"
+rm -rf $fileName
