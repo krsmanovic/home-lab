@@ -1,0 +1,40 @@
+#!/bin/sh
+
+mtik_upstream=$(curl -s http://upgrade.mikrotik.com/routeros/LATEST.6fix | awk '{print $1}' | tr -d "\r")
+mtik_upstream_major=$(echo $mtik_upstream | awk -F '.' '{print $1}')
+mtik_upstream_minor=$(echo $mtik_upstream | awk -F '.' '{print $2}')
+mtik_upstream_patch=$(echo $mtik_upstream | awk -F '.' '{print $3}')
+
+mtik_date=$(curl -s http://upgrade.mikrotik.com/routeros/$mtik_upstream/CHANGELOG | grep $mtik_upstream | awk -F '(' '{print $2}' | awk '{print $1}')
+mtik_date_math=$(echo $mtik_date | sed -e 's/Jan/01/1' -e 's/Feb/02/1' -e 's/Mar/03/1' -e 's/Apr/04/1' -e 's/May/05/1' -e 's/Jun/06/1' -e 's/Jul/07/1' -e 's/Aug/08/1' -e 's/Sep/09/1' -e 's/Oct/10/1' -e 's/Nov/11/1' -e 's/Dec/12/1')
+mtik_age_days=$(echo $(( ($(date +%s) - $(date +%s -d "$mtik_date_math")) / 86400 )))
+
+compare_version () {
+  local router_name=$1
+  router_ssh="ssh robot@$router_name"
+  mtik_installed=$($router_ssh ':put [/system package update get value-name=installed-version]' | tr -d "\r")
+  mtik_installed_major=$(echo $mtik_installed | awk -F '.' '{print $1}')
+  mtik_installed_minor=$(echo $mtik_installed | awk -F '.' '{print $2}')
+  mtik_installed_patch=$(echo $mtik_installed | awk -F '.' '{print $3}')
+  if [[ "$mtik_upstream_major" -gt "$mtik_installed_major" || "$mtik_upstream_minor" -gt "$mtik_installed_minor" || "$mtik_upstream_patch" -gt "$mtik_installed_patch" ]]; then
+    $router_ssh ":log info \"New long-term-stable version older than a month is detected. It is safe to start the update.\""
+    $router_ssh "/system script run check-for-update"
+  else
+    $router_ssh ":log info \"Latest long-term-stable version is already installed.\""
+  fi
+}
+
+too_risky () {
+  local router_name=$1
+  router_ssh="ssh robot@$router_name"
+  $router_ssh ":log info \"New long-term-stable version less than a month old is detected. Staying with current version.\""
+}
+
+if [[ $mtik_age_days > 30 ]]; then
+  compare_version ap.lan
+  sleep 15m
+  compare_version fw.lan
+else
+  too_risky ap.lan
+  too_risky fw.lan
+fi
