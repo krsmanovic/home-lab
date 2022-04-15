@@ -1,6 +1,6 @@
 FROM alpine:3.15
 
-RUN apk add curl jq nextcloud-sqlite openssh \
+RUN apk add curl jq nextcloud-sqlite openssh bash \
     && mkdir -p /housekeeper/env /root/.ssh
 
 COPY scripts/ripe-bgp-telemach scripts/mtik-backup scripts/nextcloud-me /etc/periodic/monthly/
