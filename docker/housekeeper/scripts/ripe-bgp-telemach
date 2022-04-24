@@ -59,3 +59,9 @@ query_ripe () {
     $router_ssh ":log info \"The bgp-$ripe_block address list has no changes compared to the existing version.\""
   fi
 }
+
+declare -a telemach_array=("sbb AS31042" "telemach-ba AS42560" "telemach-hosting AS41828" "telemach-hr AS205714" "telemach-me AS43846" "telemach-si AS3212")
+
+for idx in ${!telemach_array[@]}; do
+  query_ripe ${telemach_array[$idx]}
+done
