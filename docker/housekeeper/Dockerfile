@@ -1,6 +1,6 @@
-FROM alpine:3.15
+FROM alpine:3.16
 
-RUN apk add curl jq nextcloud-sqlite openssh bash \
+RUN apk add curl jq nextcloud-sqlite openssh bash s6 \
     && mkdir -p /housekeeper/env /root/.ssh
 
 COPY scripts/ripe-bgp-telemach scripts/mtik-backup scripts/nextcloud-me /etc/periodic/monthly/
@@ -10,5 +10,5 @@ COPY ./conf/ssh-client-config /root/.ssh/config
 
 RUN chmod 400 /root/.ssh/id_rsa
 
-ENTRYPOINT [ "/usr/bin/tail" ]
-CMD [ "-f", "/proc/net/stat/nf_conntrack" ]
+ENTRYPOINT [ "/usr/sbin/crond" ]
+CMD [ "-f" ]
