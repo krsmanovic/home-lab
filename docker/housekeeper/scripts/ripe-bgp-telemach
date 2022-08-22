@@ -1,5 +1,6 @@
 #!/bin/bash
 
+
 query_ripe () {
   local ripe_block=$1
   local as_number=$2
@@ -14,6 +15,7 @@ query_ripe () {
     was_empty=yes
   fi
   list_rsc_prev_month="$(ls -t1 $folder/*rsc | head -1)"
+  md5_previous=$(md5sum "$list_rsc_prev_month" | cut -d " " -f1)
 
   if [ ! -d $folder ]; then
     mkdir -p $folder
@@ -30,14 +32,13 @@ query_ripe () {
 
   router_ssh="ssh -T robot@fw.lan"
   md5_current=$(md5sum "$list_rsc" | cut -d " " -f1)
-  md5_previous=$(md5sum "$list_rsc_prev_month" | cut -d " " -f1)
 
   if [ "$md5_current" != "$md5_previous" ]; then
     > addlines
     > deladdress
     > dellines
-    diff $list_rsc_prev_month $list_rsc | grep '> ' | sed 's/^> //' >> addlines
-    diff $list_rsc_prev_month $list_rsc | grep '< '| sed 's/^.*address\=//' | sed 's/ .*//' >> deladdress
+    diff $list_rsc_prev_month $list_rsc | grep '^+' | sed '/^++/d' | sed 's/^+//' >> addlines
+    diff $list_rsc_prev_month $list_rsc | grep '^-' | sed '/^--/d' | sed 's/^.*address\=//' | sed 's/ .*//' >> deladdress
     if [[ -s deladdress ]]; then
       while read -r adresa
       do
