@@ -1,11 +1,14 @@
 version: "3.8"
 services:
   cron-keeper:
-    image: housekeeper:20220325
+    image: housekeeper:20220822
     hostname: housekeeper
+    container_name: housekeeper
     extra_hosts:
       fw.lan: 192.168.11.254
       ap.lan: 192.168.99.2
+      upgrade.mikrotik.com: 159.148.172.226
+      stat.ripe.net: 193.0.6.150
     dns:
       - 192.168.20.1
     env_file:
@@ -14,3 +17,7 @@ services:
       - './scripts:/scripts'
       - '/var/log/:/var/log/'
     restart: unless-stopped
+networks:
+  default:
+    external:
+      name: br-housekeeper
